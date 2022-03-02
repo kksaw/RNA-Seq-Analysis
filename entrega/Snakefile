@@ -1,0 +1,31 @@
+DATASETS = ["WT_S1",
+            "WT_S2",
+            "WT_S3",
+            "Wt-LPS-S4",
+            "Wt-LPS-S5",
+            "Wt-LPS-S6",
+            "H14-LPS-S7",
+            "H14-LPS-S8",
+            "H14-LPS-S9",
+            "H14_S10",
+            "H14_S11",
+            "H14_S12"]
+
+SALMON = "bin/salmon-1.5.2/bin/salmon"
+
+rule all:
+    input: expand("quants/{dataset}/quant.sf", dataset=DATASETS)
+
+rule salmon_quant:
+    input:
+        r1 = "data/{sample}/{sample}_R1.fastq.gz",
+        r2 = "data/{sample}/{sample}_R2.fastq.gz",
+        index = "gencode.vM27_salmon_1.5.2"
+    output:
+        "quants/{sample}/quant.sf"
+    params:
+        dir = "quants/{sample}"
+    shell:
+        "{SALMON} quant -i {input.index} -l A -p 8 --validateMappings \
+         --gcBias --numGibbsSamples 20 -o {params.dir} \
+         -1 {input.r1} -2 {input.r2}"

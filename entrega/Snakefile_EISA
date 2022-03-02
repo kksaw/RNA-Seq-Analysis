@@ -1,0 +1,21 @@
+SAMPLES = ["WT_S1", "WT_S2", "WT_S3",
+            "Wt-LPS-S4", "Wt-LPS-S5", "Wt-LPS-S6",
+            "H14-LPS-S7", "H14-LPS-S8", "H14-LPS-S9",
+            "H14_S10", "H14_S11", "H14_S12"]
+
+rule all:
+    input:
+        "quants_eisa_any/ExonicCounts.txt",
+        "quants_eisa_any/IntronicCounts.txt"
+
+rule quasr_quant:
+    input:
+        expand("data/{sample}/{sample}_R{i}.fastq.gz", sample=SAMPLES, i=[1, 2])
+    output:
+        "quants_eisa/ExonicCounts.txt",
+        "quants_eisa/IntronicCounts.txt"
+    params:
+        sampleFile = "sampleFile_EISA.txt",
+        cpus = 1
+    shell:
+        "Rscript script/alignment_EISA.R -q {params.sampleFile} -t {params.cpus}"
