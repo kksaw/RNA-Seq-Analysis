@@ -1,0 +1,24 @@
+DATASETS = ["SRR13022868", "SRR13022869", "SRR13022870", "SRR13022871", "SRR13022872",
+            "SRR13022873", "SRR13022874", "SRR13022875", "SRR13022876", "SRR13022877",
+            "SRR13022878", "SRR13022879", "SRR13022880", "SRR13022881", "SRR13022882",
+            "SRR13022883", "SRR13022884", "SRR13022885", "SRR13022886", "SRR13022887",
+            "SRR13022888", "SRR13022889", "SRR13022890"]
+
+SALMON = "hpc-work/bin/salmon-1.5.2_linux_x86_64/bin/salmon"
+
+rule all:
+    input: expand("rds-mrc_tox-XUr6B1Jhndg/kks36/ace/quants_asthma/{dataset}/quant.sf", dataset=DATASETS)
+
+rule salmon_quant:
+    input:
+        r1 = "rds-mrc_tox-XUr6B1Jhndg/kks36/ace/data_asthma/{sample}_1.fastq",
+        r2 = "rds-mrc_tox-XUr6B1Jhndg/kks36/ace/data_asthma/{sample}_2.fastq",
+        index = "rds-mrc_tox-XUr6B1Jhndg/kks36/ace/gencode.v38_salmon_1.5.2"
+    output:
+        "rds-mrc_tox-XUr6B1Jhndg/kks36/ace/quants_asthma/{sample}/quant.sf"
+    params:
+        dir = "rds-mrc_tox-XUr6B1Jhndg/kks36/ace/quants_asthma/{sample}"
+    shell:
+        "{SALMON} quant -i {input.index} -l A -p 8 --validateMappings \
+         --gcBias --numGibbsSamples 20 -o {params.dir} \
+         -1 {input.r1} -2 {input.r2}"
